@@ -5,7 +5,7 @@ namespace CodeBase.Infrastructure.Services.Refill
 {
     public class RefillService : IRefillService
     {
-        public CellData[,] CreateEmptyGameField(Vector2Int size)
+        public CellData[,] CreateEmptyGameboard(Vector2Int size)
         {
             int width = size.x;
             int height = size.y;
@@ -17,10 +17,10 @@ namespace CodeBase.Infrastructure.Services.Refill
             }
             return field;
         }
-        public CellData[,] ReFillGameField(CellData[,] field, Vector2Int clickPosition, int countMines)
+        public CellData[,] ReFillGameboard(CellData[,] gameBoard, Vector2Int clickPosition, int countMines)
         {
-            int width = field.GetUpperBound(0) + 1;
-            int height = field.GetUpperBound(1) + 1;
+            int width = gameBoard.GetUpperBound(0) + 1;
+            int height = gameBoard.GetUpperBound(1) + 1;
             const int MineValue = -1;
 
             bool hasSafeCell = clickPosition.x >= 0 && clickPosition.x < width &&
@@ -39,7 +39,7 @@ namespace CodeBase.Infrastructure.Services.Refill
                 int roll = Random.Range(0, remainingCells);
                 if (roll < remainingMines)
                 {
-                    field[x, y].Value = MineValue;
+                    gameBoard[x, y].Value = MineValue;
                     remainingMines--;
 
                     int left = x - 1;
@@ -49,26 +49,26 @@ namespace CodeBase.Infrastructure.Services.Refill
 
                     if (left >= 0)
                     {
-                        if (field[left, y].Value != MineValue) field[left, y].Value++;
-                        if (down >= 0 && field[left, down].Value != MineValue) field[left, down].Value++;
-                        if (up < height && field[left, up].Value != MineValue) field[left, up].Value++;
+                        if (gameBoard[left, y].Value != MineValue) gameBoard[left, y].Value++;
+                        if (down >= 0 && gameBoard[left, down].Value != MineValue) gameBoard[left, down].Value++;
+                        if (up < height && gameBoard[left, up].Value != MineValue) gameBoard[left, up].Value++;
                     }
 
                     if (right < width)
                     {
-                        if (field[right, y].Value != MineValue) field[right, y].Value++;
-                        if (down >= 0 && field[right, down].Value != MineValue) field[right, down].Value++;
-                        if (up < height && field[right, up].Value != MineValue) field[right, up].Value++;
+                        if (gameBoard[right, y].Value != MineValue) gameBoard[right, y].Value++;
+                        if (down >= 0 && gameBoard[right, down].Value != MineValue) gameBoard[right, down].Value++;
+                        if (up < height && gameBoard[right, up].Value != MineValue) gameBoard[right, up].Value++;
                     }
 
-                    if (down >= 0 && field[x, down].Value != MineValue) field[x, down].Value++;
-                    if (up < height && field[x, up].Value != MineValue) field[x, up].Value++;
+                    if (down >= 0 && gameBoard[x, down].Value != MineValue) gameBoard[x, down].Value++;
+                    if (up < height && gameBoard[x, up].Value != MineValue) gameBoard[x, up].Value++;
                 }
 
                 remainingCells--;
             }
 
-            return field;
+            return gameBoard;
         }
     }
 }

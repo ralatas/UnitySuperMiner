@@ -55,6 +55,12 @@ namespace CodeBase.Infrastructure.Services.View
             }
         }
 
+        public void MarkCell(CellData cellData)
+        {
+            SpriteRenderer renderer = cellData.View.GetComponent<SpriteRenderer>();
+            renderer.sprite = cellData.IsMark ? cellData.View.flagSprite: cellData.View.closedSprite ;
+        }
+
         public void Clear()
         {
             for (int i = 0; i < _spawnedCells.Count; i++)

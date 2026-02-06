@@ -58,7 +58,7 @@ namespace CodeBase.Infrastructure.StateMachine.States
         {
           
             Vector2Int size = new Vector2Int(10, 5);
-            CellData[,] emptyGameBoard = _refillService.CreateEmptyGameField(size);
+            CellData[,] emptyGameBoard = _refillService.CreateEmptyGameboard(size);
             _gameBoardModel.SetGameBoard(emptyGameBoard);
             if (!_assetsProvider.TryGet(BoardContainerKey, out Transform boardContainer) ||
                 !_assetsProvider.TryGet(CellPrefabKey, out GameObject cellPrefab))
@@ -66,7 +66,6 @@ namespace CodeBase.Infrastructure.StateMachine.States
                 Debug.LogError("Game board assets are not registered.");
                 return;
             }
-
             _gameBoardViewService.RenderListCells(boardContainer, cellPrefab, new Vector2(0.5f, 0.5f));
             Debug.Log("Entering Game Board");
         }
@@ -80,19 +79,47 @@ namespace CodeBase.Infrastructure.StateMachine.States
         {
             if (_inputService.TryOpenButtonUp())
             {
-                CellView cellView = _inputService.GetMouseClickCell();
-                if (cellView != null) {
-                    CellData[,]gameBoard =_refillService.ReFillGameField(
-                        _gameBoardModel.GameBoard,
-                        cellView.WorldPosition, 
-                        5);
-                    CellData cellData = gameBoard[cellView.WorldPosition.x, cellView.WorldPosition.y]; 
-                    _gameBoardModel.SetGameBoard(gameBoard);
-                    _gameBoardViewService.OpenCell(cellData);
-                    _matchService.TryOpenNearSimilarField(cellData);
-                    _stateMachine.SetState<PlayingState>();
-                }
+                OpenFirstCell();
             }
+
+            if (_inputService.MarkFieldButtonUp())
+            {
+                MarkCell();
+            }
+        }
+
+        private void OpenFirstCell()
+        {
+            CellView cellView = _inputService.GetMouseClickCell();
+            if (cellView != null) {
+                var cellData = CreateNewGameboard(cellView);
+                _gameBoardViewService.OpenCell(cellData);
+                _matchService.TryOpenNearSimilarField(cellData);
+                _stateMachine.SetState<PlayingState>();
+            }
+        }
+        private void MarkCell()
+        {
+            CellView cellView = _inputService.GetMouseClickCell();
+            if (cellView != null)
+            {
+                var cellData = CreateNewGameboard(cellView);
+                Debug.Log("Marking cell " + cellView.WorldPosition.x + " " + cellView.WorldPosition.y);
+                cellData.IsMark = !cellData.IsMark;
+                _gameBoardViewService.MarkCell(cellData);
+                _stateMachine.SetState<PlayingState>();
+            }
+        }
+
+        private CellData CreateNewGameboard(CellView cellView)
+        {
+            CellData[,]gameBoard =_refillService.ReFillGameboard(
+                _gameBoardModel.GameBoard,
+                cellView.WorldPosition, 
+                5);
+            CellData cellData = gameBoard[cellView.WorldPosition.x, cellView.WorldPosition.y]; 
+            _gameBoardModel.SetGameBoard(gameBoard);
+            return cellData;
         }
     }
 }

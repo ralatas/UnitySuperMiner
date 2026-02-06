@@ -42,11 +42,24 @@ namespace CodeBase.Infrastructure.StateMachine.States
         public void Tick()
         {
             if (_inputService.TryOpenButtonUp())
-            {
                 CheckCell();
-            }
+            if (_inputService.MarkFieldButtonUp())
+                MarkCell();
         }
 
+        private void MarkCell()
+        {
+            CellView cellView = _inputService.GetMouseClickCell();
+            if (cellView != null)
+            {
+                CellData cellData = _gameBoardModel.GameBoard[cellView.WorldPosition.x, cellView.WorldPosition.y];
+                if (cellData != null && !cellData.IsOpen)
+                {
+                    cellData.IsMark = !cellData.IsMark;
+                    _gameBoardViewService.MarkCell(cellData);
+                }
+            }
+        }
         private void CheckCell()
         {
             CellView cellView = _inputService.GetMouseClickCell();
@@ -60,12 +73,9 @@ namespace CodeBase.Infrastructure.StateMachine.States
                     _matchService.TryOpenNearSimilarField(cellData);
                     if (cellData.Value == -1)
                     { 
-                        //Проиграли
+                        //_stateMachine.SetState<LoseState>();
                     }
                 }
-
-                //Debug.Log(cellData.Value);
-                //_matchService.TryOpenNearSimilarField(cell.WorldPosition);
                 //_stateMachine.SetState<PlayingState>();
             }
         }
