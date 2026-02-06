@@ -47,7 +47,7 @@ namespace CodeBase.Infrastructure.Services.View
             {
                 CellData cell = _gameBoardModel.GameBoard[x, y];
                 SpriteRenderer renderer = cell.View.GetComponent<SpriteRenderer>();
-                if (cell.Value == -1)
+                if (cell.Value == -1 && !cell.IsMark)
                 {
                     if(renderer.sprite != cell.View.bombRedSprite)
                         renderer.sprite = cell.View.bombSprite;
