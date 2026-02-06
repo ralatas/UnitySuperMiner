@@ -9,13 +9,13 @@ namespace CodeBase.Infrastructure.Services.Refill
         {
             int width = size.x;
             int height = size.y;
-            CellData[,] field = new CellData[width, height];
+            CellData[,] emptyBoard = new CellData[width, height];
             for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++)
             {
-                field[x, y] = new CellData { Value = 0, IsOpen = false };
+                emptyBoard[x, y] = new CellData { Value = 0, IsOpen = false };
             }
-            return field;
+            return emptyBoard;
         }
         public CellData[,] ReFillGameboard(CellData[,] gameBoard, Vector2Int clickPosition, int countMines)
         {

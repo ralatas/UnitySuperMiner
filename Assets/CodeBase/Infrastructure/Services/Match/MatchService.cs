@@ -50,6 +50,7 @@ namespace CodeBase.Infrastructure.Services.Match
                 if (!current.IsOpen)
                 {
                     current.IsOpen = true;
+                    Debug.Log("Пытаюсб открыть");
                     _gameBoardViewService.OpenCell(current);
                 }
 

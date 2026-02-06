@@ -21,6 +21,7 @@ namespace CodeBase.Infrastructure.StateMachine
         private readonly IGameStateFactory _stateFactory;
         private readonly Dictionary<Type, IGameState> _states = new Dictionary<Type, IGameState>();
         private readonly TickableManager _tickableManager;
+        private readonly HashSet<ITickable> _registeredTickables = new HashSet<ITickable>();
 
         public StateMachine(IGameStateFactory stateFactory, TickableManager tickableManager)
         {
@@ -43,14 +44,26 @@ namespace CodeBase.Infrastructure.StateMachine
                 return;
 
             if (Current is ITickable previousTickable)
-                _tickableManager.Remove(previousTickable);
+                RemoveTickable(previousTickable);
 
             Current?.Exit();
             Current = nextState;
             Current.Enter();
             if (Current is ITickable currentTickable)
-                _tickableManager.Add(currentTickable);
+                AddTickable(currentTickable);
             StateChanged?.Invoke(Current);
+        }
+
+        private void AddTickable(ITickable tickable)
+        {
+            if (_registeredTickables.Add(tickable))
+                _tickableManager.Add(tickable);
+        }
+
+        private void RemoveTickable(ITickable tickable)
+        {
+            if (_registeredTickables.Remove(tickable))
+                _tickableManager.Remove(tickable);
         }
     }
 }

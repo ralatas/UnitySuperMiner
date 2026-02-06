@@ -1,3 +1,4 @@
+using System;
 using CodeBase.Gameplay;
 using CodeBase.Infrastructure.Common;
 using CodeBase.Infrastructure.Services.Input;
@@ -11,23 +12,10 @@ using Zenject;
 namespace CodeBase.Infrastructure.StateMachine.States
 
 {
-    public interface IEnterStatePayload : TPayload
-    {
-        Transform Parent{ get; set; }
-        GameObject Prefub { get; set; }
-    }
-
-    public class EnterStatePayload : IEnterStatePayload
-    {
-        public Transform Parent { get; set; }
-        public GameObject Prefub { get; set; }
-    }
-
     public class ReadyState : IGameState, ITickable
     {
         private const string BoardContainerKey = "BoardContainer";
         private const string CellPrefabKey = "CellPrefab";
-
         private readonly IRefillService _refillService;
         private readonly IGameBoardModel _gameBoardModel;
         private readonly IGameBoardViewService _gameBoardViewService;
@@ -35,7 +23,6 @@ namespace CodeBase.Infrastructure.StateMachine.States
         private readonly IStateMachine _stateMachine;
         private readonly IAssetsProvider _assetsProvider;
         private readonly IMatchService _matchService;
-
         public ReadyState(
             IRefillService  refillService,
             IGameBoardModel  gameBoardModel, 
@@ -53,13 +40,15 @@ namespace CodeBase.Infrastructure.StateMachine.States
             _refillService = refillService;
             _assetsProvider = assetsProvider;
         }
-        
         public void Enter()
         {
-          
+            CleanBoard();
             Vector2Int size = new Vector2Int(10, 5);
             CellData[,] emptyGameBoard = _refillService.CreateEmptyGameboard(size);
             _gameBoardModel.SetGameBoard(emptyGameBoard);
+            _gameBoardModel.UpdateCountOpenedElements(0);
+            _gameBoardModel.UpdateCountMarketElements(0);
+
             if (!_assetsProvider.TryGet(BoardContainerKey, out Transform boardContainer) ||
                 !_assetsProvider.TryGet(CellPrefabKey, out GameObject cellPrefab))
             {
@@ -69,30 +58,34 @@ namespace CodeBase.Infrastructure.StateMachine.States
             _gameBoardViewService.RenderListCells(boardContainer, cellPrefab, new Vector2(0.5f, 0.5f));
             Debug.Log("Entering Game Board");
         }
-
+        private void CleanBoard()
+        {
+            if (_gameBoardModel.GameBoard != null)
+            {
+                int width = _gameBoardModel.GameBoard.GetLength(0);
+                int height = _gameBoardModel.GameBoard.GetLength(1);
+                for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                {
+                    _gameBoardViewService.DestroyCell(_gameBoardModel.GameBoard[x, y]);
+                }
+            }
+        }
         public void Exit()
         {
             Debug.Log("Exiting Game Board");
         }
-
         public void Tick()
         {
-            if (_inputService.TryOpenButtonUp())
-            {
-                OpenFirstCell();
-            }
-
-            if (_inputService.MarkFieldButtonUp())
-            {
-                MarkCell();
-            }
+            if (_inputService.TryOpenButtonUp()) OpenFirstCell();
+            if (_inputService.MarkFieldButtonUp()) MarkCell();
         }
-
         private void OpenFirstCell()
         {
             CellView cellView = _inputService.GetMouseClickCell();
             if (cellView != null) {
-                var cellData = CreateNewGameboard(cellView);
+                CellData cellData = CreateNewGameboard(cellView);
+                cellData.IsOpen = true;
                 _gameBoardViewService.OpenCell(cellData);
                 _matchService.TryOpenNearSimilarField(cellData);
                 _stateMachine.SetState<PlayingState>();
@@ -103,20 +96,19 @@ namespace CodeBase.Infrastructure.StateMachine.States
             CellView cellView = _inputService.GetMouseClickCell();
             if (cellView != null)
             {
-                var cellData = CreateNewGameboard(cellView);
-                Debug.Log("Marking cell " + cellView.WorldPosition.x + " " + cellView.WorldPosition.y);
+                CellData cellData = CreateNewGameboard(cellView);
                 cellData.IsMark = !cellData.IsMark;
+    
+                int newCountMarketElements = cellData.IsMark ? _gameBoardModel.CountMarketElements + 1 : _gameBoardModel.CountMarketElements -1;
+                _gameBoardModel.UpdateCountMarketElements(newCountMarketElements);
                 _gameBoardViewService.MarkCell(cellData);
                 _stateMachine.SetState<PlayingState>();
             }
         }
-
         private CellData CreateNewGameboard(CellView cellView)
         {
-            CellData[,]gameBoard =_refillService.ReFillGameboard(
-                _gameBoardModel.GameBoard,
-                cellView.WorldPosition, 
-                5);
+            var countMines = 5;
+            CellData[,]gameBoard =_refillService.ReFillGameboard(_gameBoardModel.GameBoard, cellView.WorldPosition, countMines);
             CellData cellData = gameBoard[cellView.WorldPosition.x, cellView.WorldPosition.y]; 
             _gameBoardModel.SetGameBoard(gameBoard);
             return cellData;

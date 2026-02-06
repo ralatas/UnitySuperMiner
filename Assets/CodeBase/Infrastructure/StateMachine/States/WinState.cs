@@ -1,12 +1,12 @@
+using UnityEngine;
+
 namespace CodeBase.Infrastructure.StateMachine.States
 {
     public class WinState : IGameState
     {
         public void Enter()
         {
-        }
-        public void Enter(TPayload payload)
-        {
+            Debug.Log("Entering WinState");
         }
 
         public void Exit()

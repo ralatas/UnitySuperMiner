@@ -1,4 +1,5 @@
 using CodeBase.Gameplay;
+using System.Linq;
 using CodeBase.Infrastructure.Common;
 using CodeBase.Infrastructure.Services.Input;
 using CodeBase.Infrastructure.Services.Match;
@@ -56,7 +57,10 @@ namespace CodeBase.Infrastructure.StateMachine.States
                 if (cellData != null && !cellData.IsOpen)
                 {
                     cellData.IsMark = !cellData.IsMark;
+                    int newCountMarketElements = cellData.IsMark ? _gameBoardModel.CountMarketElements + 1 : _gameBoardModel.CountMarketElements -1;
+                    _gameBoardModel.UpdateCountMarketElements(newCountMarketElements);
                     _gameBoardViewService.MarkCell(cellData);
+                    TryWinGame();
                 }
             }
         }
@@ -73,10 +77,26 @@ namespace CodeBase.Infrastructure.StateMachine.States
                     _matchService.TryOpenNearSimilarField(cellData);
                     if (cellData.Value == -1)
                     { 
-                        //_stateMachine.SetState<LoseState>();
+                        _stateMachine.SetState<LoseState>();
                     }
+                    else
+                    {
+                        TryWinGame();
+                    }
+                    
                 }
-                //_stateMachine.SetState<PlayingState>();
+            }
+        }
+
+        private void TryWinGame()
+        {
+            int countElement = _gameBoardModel.GameBoard.Length;
+            // Debug.Log("countElement " + countElement);
+            // Debug.Log("countOpenedSafeCells " +_gameBoardModel.CountOpenedElements);
+            // Debug.Log("countMarketElements " + _gameBoardModel.CountMarketElements);
+            if (countElement - _gameBoardModel.CountOpenedElements == _gameBoardModel.CountMarketElements)
+            {
+                _stateMachine.SetState<WinState>();
             }
         }
     }

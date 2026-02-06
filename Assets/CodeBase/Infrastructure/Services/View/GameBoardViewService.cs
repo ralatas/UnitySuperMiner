@@ -9,7 +9,6 @@ namespace CodeBase.Infrastructure.Services.View
 {
     public class GameBoardViewService : IGameBoardViewService
     {
-        private readonly List<CellView> _spawnedCells = new List<CellView>();
         private readonly IGameBoardModel _gameBoardModel;
         private readonly ICellViewFactory _cellViewFactory;
 
@@ -20,8 +19,6 @@ namespace CodeBase.Infrastructure.Services.View
         }
         public void RenderListCells(Transform parent, GameObject cellPrefab, Vector2 cellSize)
         {
-            Clear();
-
             if (_gameBoardModel == null || _gameBoardModel.GameBoard == null || parent == null || cellPrefab == null)
                 return;
             
@@ -38,12 +35,13 @@ namespace CodeBase.Infrastructure.Services.View
                 cell.transform.localPosition = localPosition;
                 cell.WorldPosition = new Vector2Int(x, y);
                 _gameBoardModel.GameBoard[x, y].View = cell;
-                _spawnedCells.Add(cell);
             }
         }
 
         public void OpenCell(CellData cellData)
         {
+            _gameBoardModel.UpdateCountOpenedElements(_gameBoardModel.CountOpenedElements + 1);
+            Debug.Log(_gameBoardModel.CountOpenedElements);
             SpriteRenderer renderer = cellData.View.GetComponent<SpriteRenderer>();
             if (cellData.Value == -1)
             {
@@ -61,15 +59,13 @@ namespace CodeBase.Infrastructure.Services.View
             renderer.sprite = cellData.IsMark ? cellData.View.flagSprite: cellData.View.closedSprite ;
         }
 
-        public void Clear()
+        public void DestroyCell(CellData cellData)
         {
-            for (int i = 0; i < _spawnedCells.Count; i++)
-            {
-                if (_spawnedCells[i] != null)
-                    Object.Destroy(_spawnedCells[i]);
-            }
+            if (cellData?.View == null)
+                return;
 
-            _spawnedCells.Clear();
+            Object.Destroy(cellData.View.gameObject);
+            cellData.View = null;
         }
     }
 }
