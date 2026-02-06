@@ -5,10 +5,8 @@ namespace CodeBase.Infrastructure.Services.Refill
 {
     public class RefillService : IRefillService
     {
-        public CellData[,] CreateEmptyGameboard(Vector2Int size)
+        public CellData[,] CreateEmptyGameboard(int width, int height)
         {
-            int width = size.x;
-            int height = size.y;
             CellData[,] emptyBoard = new CellData[width, height];
             for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++)

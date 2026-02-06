@@ -43,8 +43,7 @@ namespace CodeBase.Infrastructure.StateMachine.States
         public void Enter()
         {
             CleanBoard();
-            Vector2Int size = new Vector2Int(10, 5);
-            CellData[,] emptyGameBoard = _refillService.CreateEmptyGameboard(size);
+            CellData[,] emptyGameBoard = _refillService.CreateEmptyGameboard(_gameBoardModel.Width, _gameBoardModel.Height);
             _gameBoardModel.SetGameBoard(emptyGameBoard);
             _gameBoardModel.UpdateCountOpenedElements(0);
             _gameBoardModel.UpdateCountMarketElements(0);
@@ -107,8 +106,7 @@ namespace CodeBase.Infrastructure.StateMachine.States
         }
         private CellData CreateNewGameboard(CellView cellView)
         {
-            var countMines = 5;
-            CellData[,]gameBoard =_refillService.ReFillGameboard(_gameBoardModel.GameBoard, cellView.WorldPosition, countMines);
+            CellData[,]gameBoard =_refillService.ReFillGameboard(_gameBoardModel.GameBoard, cellView.WorldPosition, _gameBoardModel.BombCount);
             CellData cellData = gameBoard[cellView.WorldPosition.x, cellView.WorldPosition.y]; 
             _gameBoardModel.SetGameBoard(gameBoard);
             return cellData;

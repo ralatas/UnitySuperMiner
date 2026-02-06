@@ -5,15 +5,12 @@ using Zenject;
 
 namespace CodeBase.Infrastructure.StateMachine
 {
-    public interface TPayload
-    {
-    }
-
     public interface IStateMachine
     {
         IGameState Current { get; }
         event Action<IGameState> StateChanged;
         void SetState<TState>() where TState : class, IGameState;
+        void ForceSetState<TState>() where TState : class, IGameState;
     }
 
     public class StateMachine : IStateMachine
@@ -43,6 +40,30 @@ namespace CodeBase.Infrastructure.StateMachine
             if (ReferenceEquals(Current, nextState))
                 return;
 
+            SwitchState(nextState);
+        }
+
+        public void ForceSetState<TState>() where TState : class, IGameState
+        {
+            if (!_states.TryGetValue(typeof(TState), out IGameState nextState))
+            {
+                nextState = _stateFactory.Create<TState>();
+                _states.Add(typeof(TState), nextState);
+            }
+
+            if (ReferenceEquals(Current, nextState))
+            {
+                Current?.Exit();
+                Current?.Enter();
+                StateChanged?.Invoke(Current);
+                return;
+            }
+
+            SwitchState(nextState);
+        }
+
+        private void SwitchState(IGameState nextState)
+        {
             if (Current is ITickable previousTickable)
                 RemoveTickable(previousTickable);
 

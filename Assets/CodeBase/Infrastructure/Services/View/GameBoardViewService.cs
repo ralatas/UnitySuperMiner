@@ -41,7 +41,6 @@ namespace CodeBase.Infrastructure.Services.View
         public void OpenCell(CellData cellData)
         {
             _gameBoardModel.UpdateCountOpenedElements(_gameBoardModel.CountOpenedElements + 1);
-            Debug.Log(_gameBoardModel.CountOpenedElements);
             SpriteRenderer renderer = cellData.View.GetComponent<SpriteRenderer>();
             if (cellData.Value == -1)
             {
