@@ -11,6 +11,7 @@ namespace CodeBase.Gameplay
         [SerializeField] public Sprite bombSprite;
         [SerializeField] public Sprite bombRedSprite;
         [SerializeField] public Sprite flagSprite;
+        [SerializeField] public Sprite mineWrong;
         [SerializeField] public List<Sprite> NearBombSprite;
     }
 }

@@ -38,6 +38,27 @@ namespace CodeBase.Infrastructure.Services.View
             }
         }
 
+        public void ShowBombs()
+        {
+            int width = _gameBoardModel.GameBoard.GetLength(0);
+            int height = _gameBoardModel.GameBoard.GetLength(1);
+            for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+            {
+                CellData cell = _gameBoardModel.GameBoard[x, y];
+                SpriteRenderer renderer = cell.View.GetComponent<SpriteRenderer>();
+                if (cell.Value == -1)
+                {
+                    if(renderer.sprite != cell.View.bombRedSprite)
+                        renderer.sprite = cell.View.bombSprite;
+                }
+                if (cell.Value != -1 && cell.IsMark)
+                {
+                    renderer.sprite = cell.View.mineWrong;
+                }
+            }
+        }
+
         public void OpenCell(CellData cellData)
         {
             _gameBoardModel.UpdateCountOpenedElements(_gameBoardModel.CountOpenedElements + 1);

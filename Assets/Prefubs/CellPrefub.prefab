@@ -103,6 +103,7 @@ MonoBehaviour:
   bombSprite: {fileID: 21300000, guid: ab8ca52dbe5f93e4e8ddca03923ca4a9, type: 3}
   bombRedSprite: {fileID: 21300000, guid: 9cb5ee2985a77c2439894bf18d11c2ac, type: 3}
   flagSprite: {fileID: 21300000, guid: e4f7d90879cd6474a9e02e13ed556fa7, type: 3}
+  mineWrong: {fileID: 21300000, guid: 9b1e5684f85316d4a8d7faab951d194c, type: 3}
   NearBombSprite:
   - {fileID: 21300000, guid: b77c73077ec00564ea5a6585b85fb696, type: 3}
   - {fileID: 21300000, guid: 1229f47ad795a6e40bf503d0a81db5a6, type: 3}

@@ -23,6 +23,8 @@ namespace CodeBase.Infrastructure.StateMachine.States
         private readonly IStateMachine _stateMachine;
         private readonly IAssetsProvider _assetsProvider;
         private readonly IMatchService _matchService;
+        private readonly IUIGameState _uiGameState;
+
         public ReadyState(
             IRefillService  refillService,
             IGameBoardModel  gameBoardModel, 
@@ -30,8 +32,10 @@ namespace CodeBase.Infrastructure.StateMachine.States
             IInputService inputService, 
             IStateMachine  stateMachine,
             IMatchService matchService,
+            IUIGameState  uiGameState,
             IAssetsProvider assetsProvider)
         {
+            _uiGameState = uiGameState;
             _matchService = matchService;
             _stateMachine = stateMachine;
             _inputService = inputService;
@@ -43,6 +47,7 @@ namespace CodeBase.Infrastructure.StateMachine.States
         public void Enter()
         {
             CleanBoard();
+            _uiGameState.SetPlayingGameState();
             CellData[,] emptyGameBoard = _refillService.CreateEmptyGameboard(_gameBoardModel.Width, _gameBoardModel.Height);
             _gameBoardModel.SetGameBoard(emptyGameBoard);
             _gameBoardModel.UpdateCountOpenedElements(0);

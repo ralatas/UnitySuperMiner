@@ -33,5 +33,6 @@ public class BoostrapInstaller : MonoInstaller
         Container.Bind<IRefillService>().To<RefillService>().AsSingle();
         Container.Bind<IStateMachine>().To<StateMachine>().AsSingle();
         Container.Bind<IGameStateFactory>().To<GameStateFactory>().AsSingle();
+        Container.Bind<IUIGameState>().To<UIGameState>().AsSingle();
     }
 }

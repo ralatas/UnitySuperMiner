@@ -14,6 +14,10 @@ namespace CodeBase.Infrastructure.Services.Input
     {
       return SimpleInput.GetMouseButtonUp(1);
     }
+    public bool ResetButtonUp()
+    {
+      return UnityEngine.Input.GetKeyUp(KeyCode.Space);
+    }
 
     public CellView GetMouseClickCell()
     {

@@ -6,6 +6,7 @@ namespace CodeBase.Infrastructure.Services.Input
   {
     bool TryOpenButtonUp();
     bool MarkFieldButtonUp();
+    bool ResetButtonUp();
     CellView GetMouseClickCell();
   }
 }

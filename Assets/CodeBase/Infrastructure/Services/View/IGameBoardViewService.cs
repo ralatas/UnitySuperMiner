@@ -10,6 +10,7 @@ namespace CodeBase.Infrastructure.Services.View
         void RenderListCells(Transform parent, GameObject cellPrefab, Vector2 cellSize);
         void OpenCell(CellData cellData);
         void MarkCell(CellData cellData);
+        void ShowBombs();
         void DestroyCell(CellData cellData);
     }
 }

@@ -8,11 +8,13 @@ using Zenject;
 
 public class GameBootstraper : MonoBehaviour
 {
-    private IStateMachine _stateMachine;
+    private static IInputService _inputService;
+    private static IStateMachine _stateMachine;
     
     [Inject]
-    private void Construct(IStateMachine stateMachine)
+    private void Construct(IStateMachine stateMachine, IInputService inputService)
     {
+        _inputService = inputService;
         _stateMachine = stateMachine;
     }
 
@@ -20,5 +22,11 @@ public class GameBootstraper : MonoBehaviour
     {
         _stateMachine.SetState<ReadyState>();
     }
-    
+
+    void Update()
+    {
+        if (_inputService.ResetButtonUp())
+            _stateMachine.ForceSetState<ReadyState>();
+    }
+
 }
